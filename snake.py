@@ -81,7 +81,7 @@ class Snake():
 if __name__ == "__main__":
     snake = Snake(0,3)
     food = spawn_food(snake, start = True)
-    sense.show_message("3 2 1", text_color=F, scroll_speed=0.1)
+    sense.show_message("3 2 1", text_colour=F, scroll_speed=0.1)
     render_frame(snake, food)
     while True:
         if snake.check_food(food):
