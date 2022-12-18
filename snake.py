@@ -36,7 +36,6 @@ class Snake():
         self.vector = (1,0) #right
         self.direction_map = DIRECTION_MAP = {"up": (0,-1), "down": (0,1), "right": (1,0), "left": (-1,0), "middle": self.vector}
 
-
     #function to check if snake has bitten itself
     def check_bitten_itself(self) -> bool:
         for i in range(0,len(self.coordinates) - 2):
