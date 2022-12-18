@@ -1,9 +1,9 @@
 #import sense_emu for emulator, sense_hat for when sense hat is connected
-from sense_emu import SenseHat
+from sense_hat import SenseHat
 from random import choice, randint
 from time import sleep
 
-#sense
+#sense hat
 sense = SenseHat()
 
 #constants
@@ -20,15 +20,12 @@ def render_frame(Snake, food) -> None:
         frame[a[1]*8 + a[0]] = S
     sense.set_pixels(frame)
 
-#function to spawn food
+#function to spawn food, set start = True
 def spawn_food(Snake, start=False) -> tuple:
     if start:
         return (randint(1,6), randint(1,6))
     else:
-        locations = []
-        for i in range(0,8):
-            for j in range(0,8):
-                locations.append((i,j))
+        locations = [(i,j) for i in range(0,8) for j in range(0,8)]
         possible_locations = [a for a in locations if a not in Snake.coordinates]
         return choice(possible_locations)
 
@@ -54,7 +51,7 @@ class Snake():
         else:
             return True
 
-    #function to translate last joystick event to vector checking some conditions
+    #function to translate last joystick event to vector
     def event_to_vector(self) -> None:
         events = sense.stick.get_events()
         if events:
@@ -70,7 +67,7 @@ class Snake():
         else:
             return False
 
-    #move the snake (use after each above condition is checked. direction = True for when no direction is given
+    #function to move the snake. direction = True for when no direction is given
     def move(self) -> None:
         for i in range(len(self.coordinates)-1, -1, -1):
             if i != 0:
@@ -78,25 +75,26 @@ class Snake():
             else:
                 self.coordinates[0] = (self.coordinates[0][0] + self.vector[0], self.coordinates[0][1] + self.vector[1])
 
-    #function for when the food is eaten
+    #function to grow the snake when the food is eaten
     def grow(self, food) -> None:
         self.coordinates.insert(0,food)
 
-#main
-snake = Snake(0,3)
-food = spawn_food(snake, start = True)
-while True:
-    render_frame(snake, food) #render new frame
-    if snake.check_food(food): #check if food is eaten
-        snake.grow(food)
-        food = spawn_food(snake)
-    else:
-        snake.move()
-
-    if snake.check_crash() or snake.check_bitten_itself():
-        sleep(REFRESH_INTERVAL)
-        score = len(snake.coordinates) -1
-        sense.show_message(f"You lost SCORE {score}", scroll_speed=0.1, text_colour=F)
-        break
-    else:
-        sleep(REFRESH_INTERVAL)
+if __name__ == "__main__":
+    snake = Snake(0,3)
+    food = spawn_food(snake, start = True)
+    sense.show_message("3 2 1", text_color=F, scroll_speed=0.1)
+    render_frame(snake, food)
+    while True:
+        if snake.check_food(food):
+            snake.grow(food)
+            food = spawn_food(snake)
+        else:
+            snake.move()
+        if snake.check_crash() or snake.check_bitten_itself():
+            sleep(REFRESH_INTERVAL)
+            score = len(snake.coordinates) -1
+            sense.show_message(f"You lost SCORE {score}", scroll_speed=0.05, text_colour=F)
+            break
+        else:
+            render_frame(snake, food)
+            sleep(REFRESH_INTERVAL)
